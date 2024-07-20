@@ -1,35 +1,90 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Card } from "./Card";
 
-function App() {
-  const [count, setCount] = useState(0)
+export const App = () => {
+  const [tareas, setTareas] = useState([]);
+  const [formObject, setformObject] = useState({
+    titulo: '',
+    descripcion: '',
+    is_checked: false,
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setformObject((prevFormObject) => ({
+      ...prevFormObject,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleDelete = (index) => {
+    const newTareas = tareas.filter((_, i) => i !== index);
+    setTareas(newTareas);
+  };
+
+  const save_submit = (e) => {
+    e.preventDefault();
+    setTareas([...tareas, formObject]);
+    setformObject({
+      titulo: '',
+      descripcion: '',
+      is_checked: false,
+    });
+    console.log(tareas);
+  };
 
   return (
-    <>
+    <div className="container">
+      <h1>POST It Simulator!</h1>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <form onSubmit={save_submit} style={{ width: '100%', display: 'flex', gap: '5rem' }}>
+          <div>
+            <input
+              type="text"
+              placeholder="Título"
+              value={formObject.titulo}
+              name="titulo"
+              onChange={handleChange}
+              id="titulo"
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              name="descripcion"
+              placeholder="Descripción"
+              required
+              value={formObject.descripcion}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="is_checked"
+              name="is_checked"
+              checked={formObject.is_checked}
+              onChange={handleChange}
+            />
+            <label htmlFor="is_checked">Importante!</label>
+          </div>
+          <button
+            type="submit"
+            style={{ backgroundColor: '#111', color: 'white', fontWeight: 'bold' }}
+          >
+            AGREGAR
+          </button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div>
+        <h2>LISTADO COMPLETO</h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
+          {tareas.map((task, index) => (
+            <Card key={index} tarea={task} index={index} handleDelete={handleDelete}/>
+          ))}
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
-
-export default App
+    </div>
+  );
+};
+export default App;
